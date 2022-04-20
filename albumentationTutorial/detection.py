@@ -12,8 +12,15 @@ import numpy as np
 from utils import plot_examples
 from PIL import Image
 
-image = Image.open("images/elon.jpeg")
+# image = Image.open("images/elon.jpeg")
+# mask = Image.open("images/mask.jpeg")
+# mask2 = Image.open("images/second_mask.jpeg")
 
+image = cv2.imread("images/cat.jpg")
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+bboxes = [[13,170,224,410]] # bounding box
+
+#
 transform = A.Compose(
     [
         A.Resize(width=1920, height = 1080),
@@ -27,20 +34,22 @@ transform = A.Compose(
                 A.Blur(blur_limit=3, p=0.5),
                 A.ColorJitter(p=0.5),
             ], p = 1.0),
-    ]
+    ], bbox_params=A.BboxParams(format="pascal_voc", label_fields=[], min_area = 2048, min_visibility=0.3) # Write the format of BBox , yolo, coco
 )
 
 images_list = [image]
+saved_bbox = [bboxes[0]]
 
-image = np.array(image)
-
-for i in range(15):
-    augmentations = transform(image = image)
+for i in range(4):
+    augmentations = transform(image = image, bboxes = bboxes)
     augmented_img = augmentations["image"]
     images_list.append(augmented_img)
+    if len(augmentations["bboxes"]) == 0:
+        continue
+    saved_bbox.append(augmentations["bboxes"][0])
 
+plot_examples(images_list, saved_bbox)
 
-plot_examples(images_list)
 
 
 

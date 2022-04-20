@@ -13,7 +13,8 @@ from utils import plot_examples
 from PIL import Image
 
 image = Image.open("images/elon.jpeg")
-
+mask = Image.open("images/mask.jpeg")
+mask2 = Image.open("images/second_mask.jpeg")
 transform = A.Compose(
     [
         A.Resize(width=1920, height = 1080),
@@ -33,12 +34,20 @@ transform = A.Compose(
 images_list = [image]
 
 image = np.array(image)
+mask = np.array(mask)
+mask2= np.array(mask2)
 
-for i in range(15):
-    augmentations = transform(image = image)
+for i in range(4):
+    augmentations = transform(image = image, masks = [mask, mask2])
     augmented_img = augmentations["image"]
-    images_list.append(augmented_img)
-
+    # augmented_mask = augmentations["mask"]
+    augmented_masks = augmentations["masks"]
+    # augmented_mask_2 = augmentations["mask2"]
+    #images_list.append(augmented_img)
+    # images_list.append(augmented_mask)
+    # images_list.append(augmented_mask2)
+    images_list.append(augmented_masks[0])
+    images_list.append(augmented_masks[1])
 
 plot_examples(images_list)
 
